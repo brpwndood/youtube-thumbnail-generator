@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thumbnail Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .thumbnail-font {
+            font-family: 'Roboto', sans-serif;
+        }
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full">
+        <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Thumbnail Generator</h1>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Thumbnail Preview Section -->
+            <div class="flex-1 flex justify-center items-center p-4 bg-gray-200 rounded-lg shadow-inner">
+                <!-- Wrapper to maintain a 16:9 aspect ratio responsively -->
+                <div class="relative w-full pb-[56.25%] rounded-lg overflow-hidden">
+                    <div id="thumbnail-preview" class="absolute inset-0 flex flex-col justify-center items-center p-12 text-center transition-all duration-300 bg-center bg-cover" style="background-color: #0F172A; color: #FFFFFF; background-image: none;">
+                        <div id="overlay" class="absolute inset-0 z-0 transition-opacity duration-300" style="background-color: rgba(0, 0, 0, 0.5);"></div>
+                        <div id="loading-indicator" class="absolute inset-0 flex justify-center items-center z-20 hidden">
+                            <div class="spinner w-16 h-16"></div>
+                        </div>
+                        <div class="relative z-10 flex flex-col items-center">
+                            <h2 id="thumbnail-title" class="thumbnail-font text-8xl font-black leading-tight mb-4 inline-block px-4 py-2 rounded-lg">Thumbnail Generator</h2>
+                            <p id="thumbnail-subtitle" class="thumbnail-font text-4xl font-bold leading-normal inline-block px-4 py-2 rounded-lg">Happy Youtuber!!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="flex-1 space-y-6">
+                <div class="space-y-2">
+                    <label for="title-input" class="block text-sm font-medium text-gray-700">Thumbnail Title</label>
+                    <input type="text" id="title-input" value="Thumbnail Generator" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+                </div>
+
+                <div class="space-y-2">
+                    <label for="subtitle-input" class="block text-sm font-medium text-gray-700">Subtitle</label>
+                    <input type="text" id="subtitle-input" value="Happy Youtuber!!" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+                </div>
+                
+                <div class="space-y-2">
+                    <label for="context-input" class="block text-sm font-medium text-gray-700">Additional Image Context (e.g., "robotic arm")</label>
+                    <input type="text" id="context-input" placeholder="Optional" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
+                </div>
+
+                <div class="space-y-2">
+                    <button id="generate-bg-btn" class="w-full py-3 px-4 bg-gray-800 text-white font-bold rounded-lg shadow-lg hover:bg-gray-900 focus:ring-2 focus:ring-gray-700 focus:ring-offset-2 transition-transform transform hover:scale-105">
+                        Generate Background Image
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                     <div class="space-y-2">
+                        <label for="overlay-color-input" class="block text-sm font-medium text-gray-700">Overlay Color</label>
+                        <input type="color" id="overlay-color-input" value="#000000" class="w-full h-12 rounded-lg cursor-pointer">
+                    </div>
+                    <div class="space-y-2">
+                        <label for="text-color-input" class="block text-sm font-medium text-gray-700">Text Color</label>
+                        <input type="color" id="text-color-input" value="#FFFFFF" class="w-full h-12 rounded-lg cursor-pointer">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                    <div class="space-y-2">
+                        <label for="highlight-color-input" class="block text-sm font-medium text-gray-700">Highlight Color</label>
+                        <input type="color" id="highlight-color-input" value="#FFFF00" class="w-full h-12 rounded-lg cursor-pointer">
+                    </div>
+                    <div class="flex flex-col md:flex-row gap-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" id="highlight-title-toggle" class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+                            <label for="highlight-title-toggle" class="ml-2 text-sm font-medium text-gray-700">Highlight Title</label>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" id="highlight-subtitle-toggle" class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
+                            <label for="highlight-subtitle-toggle" class="ml-2 text-sm font-medium text-gray-700">Highlight Subtitle</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="download-btn" class="w-full py-3 px-4 bg-teal-600 text-white font-bold rounded-lg shadow-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-transform transform hover:scale-105">
+                    Download Thumbnail
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const titleInput = document.getElementById('title-input');
+            const subtitleInput = document.getElementById('subtitle-input');
+            const contextInput = document.getElementById('context-input');
+            const generateBgBtn = document.getElementById('generate-bg-btn');
+            const overlayColorInput = document.getElementById('overlay-color-input');
+            const textColorInput = document.getElementById('text-color-input');
+            const highlightColorInput = document.getElementById('highlight-color-input');
+            const highlightTitleToggle = document.getElementById('highlight-title-toggle');
+            const highlightSubtitleToggle = document.getElementById('highlight-subtitle-toggle');
+            const downloadBtn = document.getElementById('download-btn');
+
+            const thumbnailPreview = document.getElementById('thumbnail-preview');
+            const thumbnailTitle = document.getElementById('thumbnail-title');
+            const thumbnailSubtitle = document.getElementById('thumbnail-subtitle');
+            const overlay = document.getElementById('overlay');
+            const loadingIndicator = document.getElementById('loading-indicator');
+
+            const updatePreview = () => {
+                thumbnailTitle.textContent = titleInput.value;
+                thumbnailSubtitle.textContent = subtitleInput.value;
+                thumbnailPreview.style.color = textColorInput.value;
+                overlay.style.backgroundColor = overlayColorInput.value;
+                overlay.style.opacity = '0';
+
+                if (highlightTitleToggle.checked) {
+                    thumbnailTitle.style.backgroundColor = highlightColorInput.value;
+                } else {
+                    thumbnailTitle.style.backgroundColor = 'transparent';
+                }
+
+                if (highlightSubtitleToggle.checked) {
+                    thumbnailSubtitle.style.backgroundColor = highlightColorInput.value;
+                } else {
+                    thumbnailSubtitle.style.backgroundColor = 'transparent';
+                }
+            };
+
+            const generateImage = async (prompt) => {
+                loadingIndicator.classList.remove('hidden');
+                generateBgBtn.disabled = true;
+                
+                const payload = {
+                    instances: {
+                        prompt: prompt,
+                    },
+                    parameters: {
+                        "sampleCount": 1
+                    }
+                };
+                
+                const apiKey = "";
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
+
+                let retries = 0;
+                const maxRetries = 5;
+                const baseDelay = 1000;
+
+                const fetchWithRetry = async () => {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                        if (!response.ok) {
+                             if (response.status === 429 && retries < maxRetries) {
+                                const delay = baseDelay * Math.pow(2, retries);
+                                retries++;
+                                await new Promise(resolve => setTimeout(resolve, delay));
+                                return fetchWithRetry();
+                            }
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response;
+                    } catch (error) {
+                         if (retries < maxRetries) {
+                            const delay = baseDelay * Math.pow(2, retries);
+                            retries++;
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                            return fetchWithRetry();
+                        }
+                        throw error;
+                    }
+                };
+
+                try {
+                    const response = await fetchWithRetry();
+                    const result = await response.json();
+                    
+                    if (result.predictions && result.predictions.length > 0 && result.predictions[0].bytesBase64Encoded) {
+                        const imageUrl = `data:image/png;base64,${result.predictions[0].bytesBase64Encoded}`;
+                        thumbnailPreview.style.backgroundImage = `url('${imageUrl}')`;
+                    } else {
+                        console.error('Image generation failed: No image data received.');
+                    }
+                } catch (error) {
+                    console.error('API call failed:', error);
+                } finally {
+                    loadingIndicator.classList.add('hidden');
+                    generateBgBtn.disabled = false;
+                }
+            };
+            
+            titleInput.addEventListener('input', updatePreview);
+            subtitleInput.addEventListener('input', updatePreview);
+            contextInput.addEventListener('input', updatePreview);
+            overlayColorInput.addEventListener('input', updatePreview);
+            textColorInput.addEventListener('input', updatePreview);
+            highlightColorInput.addEventListener('input', updatePreview);
+            highlightTitleToggle.addEventListener('change', updatePreview);
+            highlightSubtitleToggle.addEventListener('change', updatePreview);
+            
+            generateBgBtn.addEventListener('click', () => {
+                const titlePrompt = titleInput.value.trim();
+                const contextPrompt = contextInput.value.trim();
+                let fullPrompt = titlePrompt;
+                if (contextPrompt) {
+                    fullPrompt += `, ${contextPrompt}`;
+                }
+                
+                if (fullPrompt) {
+                    generateImage(fullPrompt);
+                }
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                html2canvas(thumbnailPreview, {
+                    scale: 2
+                }).then(canvas => {
+                    const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
+                    const link = document.createElement('a');
+                    link.download = 'youtube-thumbnail.png';
+                    link.href = image;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }).catch(err => {
+                    console.error('Error generating image:', err);
+                });
+            });
+
+            updatePreview();
+        });
+    </script>
+</body>
+</html>
