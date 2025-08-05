@@ -28,12 +28,15 @@
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <!-- Re-added max-w-4xl and w-full for overall layout responsiveness -->
     <div class="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full">
         <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Thumbnail Generator</h1>
 
-        <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Always flex-col for top-to-bottom flow -->
+        <div class="flex flex-col gap-8">
             <!-- Thumbnail Preview Section -->
-            
+            <!-- Removed overflow-x-auto from this div -->
+            <div class="flex justify-center items-center">
                 <!-- Wrapper to maintain a 16:9 aspect ratio responsively -->
                 <div class="relative w-full pb-[56.25%] rounded-lg overflow-hidden">
                     <div id="thumbnail-preview" class="absolute inset-0 flex flex-col justify-center items-center p-12 text-center transition-all duration-300 bg-center bg-cover" style="background-color: #0F172A; color: #FFFFFF; background-image: none;">
@@ -42,15 +45,16 @@
                             <div class="spinner w-16 h-16"></div>
                         </div>
                         <div class="relative z-10 flex flex-col items-center">
-                            <h2 id="thumbnail-title" class="thumbnail-font text-8xl font-black leading-tight mb-4 inline-block px-4 py-2 rounded-lg">Thumbnail Generator</h2>
-                            <p id="thumbnail-subtitle" class="thumbnail-font text-4xl font-bold leading-normal inline-block px-4 py-2 rounded-lg">Happy Youtuber!!</p>
+                            <!-- Adjusted text sizes for responsiveness -->
+                            <h2 id="thumbnail-title" class="thumbnail-font text-5xl sm:text-6xl lg:text-8xl font-black leading-tight mb-4 inline-block px-4 py-2 rounded-lg">Thumbnail Generator</h2>
+                            <p id="thumbnail-subtitle" class="thumbnail-font text-2xl sm:text-3xl lg:text-4xl font-bold leading-normal inline-block px-4 py-2 rounded-lg">Happy Youtuber!!</p>
                         </div>
                     </div>
-                
+                </div>
             </div>
 
             <!-- Controls Section -->
-            <div class="flex-1 space-y-6">
+            <div class="space-y-6">
                 <div class="space-y-2">
                     <label for="title-input" class="block text-sm font-medium text-gray-700">Thumbnail Title</label>
                     <input type="text" id="title-input" value="Thumbnail Generator" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-teal-500 focus:border-teal-500">
@@ -72,7 +76,7 @@
                     </button>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 gap-6">
                      <div class="space-y-2">
                         <label for="overlay-color-input" class="block text-sm font-medium text-gray-700">Overlay Color</label>
                         <input type="color" id="overlay-color-input" value="#000000" class="w-full h-12 rounded-lg cursor-pointer">
@@ -83,12 +87,12 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                <div class="grid grid-cols-1 gap-6 items-end">
                     <div class="space-y-2">
                         <label for="highlight-color-input" class="block text-sm font-medium text-gray-700">Highlight Color</label>
                         <input type="color" id="highlight-color-input" value="#FFFF00" class="w-full h-12 rounded-lg cursor-pointer">
                     </div>
-                    <div class="flex flex-col md:flex-row gap-4">
+                    <div class="flex flex-col gap-4">
                         <div class="flex items-center">
                             <input type="checkbox" id="highlight-title-toggle" class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded">
                             <label for="highlight-title-toggle" class="ml-2 text-sm font-medium text-gray-700">Highlight Title</label>
@@ -131,7 +135,7 @@
                 thumbnailSubtitle.textContent = subtitleInput.value;
                 thumbnailPreview.style.color = textColorInput.value;
                 overlay.style.backgroundColor = overlayColorInput.value;
-                overlay.style.opacity = '0';
+                overlay.style.opacity = '0.5';
 
                 if (highlightTitleToggle.checked) {
                     thumbnailTitle.style.backgroundColor = highlightColorInput.value;
