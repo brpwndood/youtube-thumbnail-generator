@@ -35,7 +35,7 @@
             <!-- Thumbnail Preview Section -->
             <div class="flex-1 flex justify-center items-center p-4 bg-gray-200 rounded-lg shadow-inner">
                 <!-- Wrapper to maintain a 16:9 aspect ratio responsively -->
-                <div class="relative w-full pb-[100%] rounded-lg overflow-hidden">
+                <div class="relative w-full pb-[56.25%] rounded-lg overflow-hidden">
                     <div id="thumbnail-preview" class="absolute inset-0 flex flex-col justify-center items-center p-12 text-center transition-all duration-300 bg-center bg-cover" style="background-color: #0F172A; color: #FFFFFF; background-image: none;">
                         <div id="overlay" class="absolute inset-0 z-0 transition-opacity duration-300" style="background-color: rgba(0, 0, 0, 0.5);"></div>
                         <div id="loading-indicator" class="absolute inset-0 flex justify-center items-center z-20 hidden">
@@ -72,7 +72,7 @@
                     </button>
                 </div>
                 
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div class="space-y-2">
                         <label for="overlay-color-input" class="block text-sm font-medium text-gray-700">Overlay Color</label>
                         <input type="color" id="overlay-color-input" value="#000000" class="w-full h-12 rounded-lg cursor-pointer">
@@ -83,7 +83,7 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-1 gap-6 items-end">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
                     <div class="space-y-2">
                         <label for="highlight-color-input" class="block text-sm font-medium text-gray-700">Highlight Color</label>
                         <input type="color" id="highlight-color-input" value="#FFFF00" class="w-full h-12 rounded-lg cursor-pointer">
