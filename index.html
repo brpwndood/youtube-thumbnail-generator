@@ -28,14 +28,11 @@
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <!-- Re-added max-w-4xl and w-full for overall layout responsiveness -->
     <div class="bg-white p-8 rounded-xl shadow-2xl max-w-4xl w-full">
         <h1 class="text-4xl font-extrabold text-center text-gray-900 mb-8">Thumbnail Generator</h1>
 
-        <!-- Always flex-col for top-to-bottom flow -->
         <div class="flex flex-col gap-8">
             <!-- Thumbnail Preview Section -->
-            <!-- Removed overflow-x-auto from this div -->
             <div class="flex justify-center items-center">
                 <!-- Wrapper to maintain a 16:9 aspect ratio responsively -->
                 <div class="relative w-full pb-[56.25%] rounded-lg overflow-hidden">
@@ -45,7 +42,6 @@
                             <div class="spinner w-16 h-16"></div>
                         </div>
                         <div class="relative z-10 flex flex-col items-center">
-                            <!-- Adjusted text sizes for responsiveness -->
                             <h2 id="thumbnail-title" class="thumbnail-font text-5xl sm:text-6xl lg:text-8xl font-black leading-tight mb-4 inline-block px-4 py-2 rounded-lg">Thumbnail Generator</h2>
                             <p id="thumbnail-subtitle" class="thumbnail-font text-2xl sm:text-3xl lg:text-4xl font-bold leading-normal inline-block px-4 py-2 rounded-lg">Happy Youtuber!!</p>
                         </div>
@@ -107,6 +103,9 @@
                 <button id="download-btn" class="w-full py-3 px-4 bg-teal-600 text-white font-bold rounded-lg shadow-lg hover:bg-teal-700 focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 transition-transform transform hover:scale-105">
                     Download Thumbnail
                 </button>
+                <p id="download-message" class="text-sm text-gray-600 text-center mt-2 hidden">
+                    Right-click (or long-press) the image in the new tab and select "Save image as..."
+                </p>
             </div>
         </div>
     </div>
@@ -123,6 +122,7 @@
             const highlightTitleToggle = document.getElementById('highlight-title-toggle');
             const highlightSubtitleToggle = document.getElementById('highlight-subtitle-toggle');
             const downloadBtn = document.getElementById('download-btn');
+            const downloadMessage = document.getElementById('download-message');
 
             const thumbnailPreview = document.getElementById('thumbnail-preview');
             const thumbnailTitle = document.getElementById('thumbnail-title');
@@ -163,7 +163,10 @@
                     }
                 };
                 
-                const apiKey = "AIzaSyBpJvNwRlhDgIDOd8Y96w4TbXcihf7eKqU";
+                // >>> IMPORTANT: Replace "YOUR_API_KEY_HERE" with your actual Google Cloud API Key <<<
+                // Get your API key from Google Cloud Console: https://console.cloud.google.com/apis/credentials
+                // Remember to restrict your API key for security!
+                const apiKey = "AIzaSyBMJpLbTxHzGxip0Z4BrSdhb7_GlF9SmEI"; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`;
 
                 let retries = 0;
@@ -212,7 +215,7 @@
                     console.error('API call failed:', error);
                 } finally {
                     loadingIndicator.classList.add('hidden');
-                    generateBgBtn.disabled = false;
+                    generateBgBtn.disabled = false; // Ensure button is re-enabled
                 }
             };
             
@@ -238,20 +241,67 @@
                 }
             });
 
-            downloadBtn.addEventListener('click', () => {
-                html2canvas(thumbnailPreview, {
-                    scale: 2
-                }).then(canvas => {
-                    const image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream');
-                    const link = document.createElement('a');
-                    link.download = 'youtube-thumbnail.png';
-                    link.href = image;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                }).catch(err => {
+            downloadBtn.addEventListener('click', async () => {
+                // Create a temporary, off-screen element for full-size capture
+                const tempDiv = document.createElement('div');
+                tempDiv.style.width = '1280px';
+                tempDiv.style.height = '720px';
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px'; // Move off-screen
+                tempDiv.style.top = '-9999px';  // Move off-screen
+                tempDiv.style.backgroundColor = thumbnailPreview.style.backgroundColor;
+                tempDiv.style.backgroundImage = thumbnailPreview.style.backgroundImage;
+                tempDiv.style.backgroundSize = thumbnailPreview.style.backgroundSize;
+                tempDiv.style.backgroundPosition = thumbnailPreview.style.backgroundPosition;
+                tempDiv.style.color = textColorInput.value; // Set text color for capture
+
+                // Clone the overlay and text content
+                const clonedOverlay = overlay.cloneNode(true);
+                tempDiv.appendChild(clonedOverlay);
+
+                const clonedTitle = thumbnailTitle.cloneNode(true);
+                clonedTitle.style.fontSize = '8rem'; // Ensure full size for capture
+                clonedTitle.style.lineHeight = '1';
+                clonedTitle.style.marginBottom = '1rem';
+                if (highlightTitleToggle.checked) {
+                    clonedTitle.style.backgroundColor = highlightColorInput.value;
+                } else {
+                    clonedTitle.style.backgroundColor = 'transparent';
+                }
+                tempDiv.appendChild(clonedTitle);
+
+                const clonedSubtitle = thumbnailSubtitle.cloneNode(true);
+                clonedSubtitle.style.fontSize = '4rem'; // Ensure full size for capture
+                clonedSubtitle.style.lineHeight = '1';
+                if (highlightSubtitleToggle.checked) {
+                    clonedSubtitle.style.backgroundColor = highlightColorInput.value;
+                } else {
+                    clonedSubtitle.style.backgroundColor = 'transparent';
+                }
+                tempDiv.appendChild(clonedSubtitle);
+
+                // Append to body, capture, then remove
+                document.body.appendChild(tempDiv);
+
+                try {
+                    const canvas = await html2canvas(tempDiv, {
+                        scale: 1, // Capture at 1:1 pixel ratio of the tempDiv
+                        width: 1280,
+                        height: 720,
+                        useCORS: true // Important for background images from other origins
+                    });
+
+                    const imageUrl = canvas.toDataURL('image/png'); // Get base64 data URL
+                    window.open(imageUrl, '_blank'); // Open in new tab
+
+                    downloadMessage.classList.remove('hidden'); // Show message
+                } catch (err) {
                     console.error('Error generating image:', err);
-                });
+                    downloadMessage.textContent = 'Error generating image. Please try again.';
+                    downloadMessage.classList.remove('hidden');
+                } finally {
+                    document.body.removeChild(tempDiv); // Clean up the temporary div
+                }
             });
 
             updatePreview();
